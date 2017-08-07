@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<div id="div"></div>
+	<p id="p">
+		<!--<span style="padding:10px;background: #ccc;margin:3px;">服装</span><span style="padding:10px;background: #ccc;">游戏</span>-->
+	</p>
+	<ul id="ul">
+		
+	</ul>
+	<script type="text/javascript">
+		/*
+			1.服装
+			2.游戏
+			3.电影
+			4.音乐
+		*/
+		var arr = ['服装','游戏','电影','音乐'];
+		//es6中允许对象中键为变量的写法
+		let obj = {
+			[arr[0]]:['男装','女装','童装','唐装','汉服','西服'],
+			[arr[1]]:['魔兽世界','LOL','DOT2','炉石','风暴英雄','守望先锋'],
+			[arr[2]]:['战狼2','阿凡达','死神来了','生化危机','异形','速度与激情','地道战'],
+			[arr[3]]:['count on me','暧昧','爱如潮水','200x年的第一场雪','告白气球','壁虎漫步']
+		}
+		//存放偏好数据
+		var arr2 = [];
+
+		var html='';
+		for (var i = 0; i < arr.length; i++) {
+			html += `<button>${arr[i]}</button>`
+		}
+		div.innerHTML = html;
+
+		var btns=document.getElementsByTagName('button');
+		for (let i = 0; i < btns.length; i++) {
+			btns[i].onclick = function () {
+				var h = '';
+				for (var j = 0; j < obj[arr[i]].length; j++) {
+					h += `<li>${obj[arr[i]][j]}</li>`;
+				}
+				ul.innerHTML=h;
+				if (!arr2.includes(arr[i])) {
+					arr2.push(arr[i]);
+				}
+				setCookie('like',JSON.stringify(arr2),2);
+			}
+		}
+
+		//判断是否有喜好
+		if (getCookie('like')!=-1) {
+			var concatArr=[];
+			var oHtml='';
+			var likes = JSON.parse(getCookie('like'));
+			for(var i=0;i<likes.length;i++){
+				oHtml += '<span style="padding:10px;background: #ccc;margin:3px;">'+likes[i]+'</span>';
+				concatArr.push(obj[likes[i]])
+			}
+			//如果有cookie值那么arr2就不能为空数组(这次点击的时候，会记录本次和上次的喜好)
+			arr2 = likes;
+			p.innerHTML = oHtml;
+			//取喜欢的数据，随机挑选几个字符出来，拼成一个数组
+			concatArr = concatArr.toString().split(',');
+			concatArr.sort(function () {
+				return Math.random() - 0.5;
+			})
+			concatArr.length = 5;
+			var h='';
+			for(var i=0;i<concatArr.length;i++){
+				h += `<li>${concatArr[i]}</li>`;
+			}
+			ul.innerHTML = h;
+		}
+
+		//点击喜好删除
+		p.onclick = function (ev){
+			if (ev.target.tagName == 'SPAN') {
+				ev.target.remove();
+				arr2 = arr2.filter(e => e != ev.target.innerHTML);
+				setCookie('like',JSON.stringify(arr2),2);
+			}
+		};
+
+		//添加cookie
+		function setCookie (key,value,time) {
+			if (time) {
+				var iDate = new Date();
+				iDate.setDate(iDate.getDate()+time);
+				document.cookie = key+'='+value+';expires='+iDate;
+			 } else {
+			 	document.cookie = key+'='+value;
+			 } 
+		}
+
+		//获取cookie
+		function getCookie (key) {
+			var str = document.cookie;
+			var arr = str.split('; ');
+			var val=null;
+			for (var i = 0; i < arr.length; i++) {
+				var arr2 = arr[i].split('=');
+				if (arr2[0]==key) {
+					val=arr2[1];
+					break;
+				}
+			}
+			if (!val) {
+				return -1;
+			} else {
+				return val;
+			}
+		}
+
+		//删除cookie
+		function removeCookie (key,value) {
+			setCookie(key,value,-1);
+		}
+	</script>
+</body>
+</html>
